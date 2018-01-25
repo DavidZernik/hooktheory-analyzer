@@ -30,16 +30,25 @@ var api_key = keys.nyt_books;
 // Pass api_key and set header
 // Render response if no errors
 app.get('/', function(req, res, next) {
-  superagent.get('https://api.nytimes.com/svc/books/v3/lists.json')
-  .query({
-    'list': 'hardcover-fiction',
-    'sort-order': 'ASC'
-  })
-  .set({ 'api_key': api_key, Accept: 'application/json' })
+    superagent.get('https://api.hooktheory.com/v1/trends/nodes')
+
+    // For NYT
+  // superagent.get('https://api.nytimes.com/svc/books/v3/lists.json')
+
+// For NYT
+  // .query({
+  //   'list': 'hardcover-fiction',
+  //   'sort-order': 'ASC'
+  // })
+  .set({ 'Authorization': 'Bearer 1317c4616fbdba61a7f1726730c01467'})
+
+  // For NYT
+  // .set({ 'api_key': api_key, Accept: 'application/json' })
   .end(function(err, response) {
     if (err) {
       next(err);
     }
+    console.log('response!', response.body[0].chord_HTML);
     return res.render('index', response.body);
   })
 });
