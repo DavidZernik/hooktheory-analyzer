@@ -18,6 +18,7 @@
   "dependencies": {
     "consolidate": "^0.14.1",
     "express": "^4.14.0",
+    "express-bootstrap-service": "^1.0.0",
     "handlebars": "^4.0.5",
     "superagent": "^2.1.0"
   }

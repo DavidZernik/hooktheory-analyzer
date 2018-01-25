@@ -9,6 +9,7 @@
 var express = require('express');
 var superagent = require('superagent');
 var consolidate = require('consolidate');
+var bootstrapService = require("express-bootstrap-service");
 
 // Create app express variable
 var app = express();
@@ -48,6 +49,8 @@ app.use(function(err, req, res, next) {
   console.error(err);
   next(err);
 });
+
+app.use(bootstrapService.serve);
 
 app.use(function(err, req, res, next) {
   res.status(404);
