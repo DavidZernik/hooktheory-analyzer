@@ -10,6 +10,7 @@
   <meta name="description" content=""/>
   <meta name="author" content=""/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
   <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -18,40 +19,182 @@
   <!-- Then include bootstrap js -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
 <body lang="en">
+    <h1>Hooktheory data visualized for a I chord</h1>
 
-  <h1>New York Times Top 20 Best Selling Hardcover Fiction</h1>
-    <!-- Results list -->
-    <ul class="book-list">
-    <!-- loop through results and display -->
-      {{#each results}}
-        <li class="book-list__item">
+    <div id="sankey_multiple" style="width: 900px; height: 300px;"></div>
 
-          <p class="ranking">List ranking: {{rank}} / Weeks on list: {{weeks_on_list}}</p>
+    <h1>First Chords</h1>
+    {{#each firstChords as |data|}}
+        <h3>next chord: {{data.child_path}}, probability: {{data.probability}}</h3>
+    {{/each}}
 
-          <!-- loop further through nested objects -->
-          {{#each book_details}}
-            <h2>{{title}}</h2>
-            <h3>{{author}}</h3>
-            <p class="description">{{description}}</p>
-            <p class="meta">Publisher: {{publisher}} / ISBN: {{primary_isbn13}}</p>
-          {{/each}}
+    <h1>Second Chords</h1>
+    {{#each secondChords as |data|}}
+        <h3>next chord: {{data.child_path}}, probability: {{data.probability}}</h3>
+    {{/each}}
 
-          <p class="date">Date published: {{published_date}}</p>
+    <h1>Third Chords</h1>
+    {{#each secondChords as |data|}}
+        <h3>next chord: {{data.child_path}}, probability: {{data.probability}}</h3>
+    {{/each}}
 
-          <p class="purchase">Buy on Amazon Books:
-            <a href={{amazon_product_url}}>{{#each book_details}} {{title}} {{/each}}</a>
-          </p>
+    <div id="chord-data" data-chord-data="{{toJSON firstChords}}"></div>
+    <div id="chord-data2" data-chord-data="{{toJSON secondChords}}"></div>
+    <div id="chord-data3" data-chord-data="{{toJSON thirdChords}}"></div>
+    <div id="chord-data4" data-chord-data="{{toJSON fourthChords}}"></div>
+    <div id="second-chord" data-chord-data="{{secondChord}}"></div>
+    <div id="third-chord" data-chord-data="{{thirdChord}}"></div>
+    <div id="fourth-chord" data-chord-data="{{fourthChord}}"></div>
 
-        </li>
-      {{/each}}
-    </ul>
+</body>
 
-    <p class="copyright">
-      {{copyright}}
-    </p>
+<script type="text/javascript">
 
-  </body>
+    var secondChord = $('#second-chord').data('chord-data');
+    secondChord = secondChord.toString();
+    // console.log('secondChord#$1', secondChord);
+    // secondChord = secondChord.concat(' ');
+    // console.log('secondChord#$2', secondChord);
+
+    var thirdChord = $('#third-chord').data('chord-data');
+    thirdChord = thirdChord.toString();
+
+    var fourthChord = $('#fourth-chord').data('chord-data');
+    fourthChord = fourthChord.toString();
+    console.log('4th', fourthChord);
+
+    var firstChords = $('#chord-data').data('chord-data');
+    firstChords = firstChords.slice(0, 3);
+
+    var secondChords = $('#chord-data2').data('chord-data');
+    secondChords = secondChords.slice(0, 3);
+
+    var thirdChords = $('#chord-data3').data('chord-data');
+    thirdChords = thirdChords.slice(0, 3);
+
+    var fourthChords = $('#chord-data4').data('chord-data');
+    fourthChords = fourthChords.slice(0, 3);
+
+
+    google.charts.load("current", {packages:["sankey"]});
+    google.charts.setOnLoadCallback(drawChart);
+     function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Weight');
+
+      var dataArray = [];
+      _.forEach(firstChords, function(item) {
+          dataArray.push(['1', item.chord_ID, item.probability]);
+      }),
+
+
+      console.log('secondChords>>>', secondChords);
+
+
+      _.forEach(secondChords, function(item) {
+          console.log('item.chord_ID before', item.chord_ID);
+          item.chord_ID = item.chord_ID.concat(' ');
+          console.log('item.chord_ID after', item.chord_ID);
+          console.log('secondChord___', secondChord);
+
+          dataArray.push([secondChord, item.chord_ID, item.probability]);
+      }),
+
+      _.forEach(thirdChords, function(item) {
+          console.log('item.chord_ID before', item.chord_ID);
+          item.chord_ID = item.chord_ID.concat('  ');
+          console.log('item.chord_ID after', item.chord_ID);
+          console.log('thirdChord___', thirdChord);
+
+          dataArray.push([thirdChord, item.chord_ID, item.probability]);
+      }),
+
+      _.forEach(fourthChords, function(item) {
+          console.log('item.chord_ID before', item.chord_ID);
+          item.chord_ID = item.chord_ID.concat('   ');
+          console.log('item.chord_ID after', item.chord_ID);
+          console.log('fourthChord___', fourthChord);
+          dataArray.push([fourthChord, item.chord_ID, item.probability]);
+      }),
+
+      console.log('dataArray++', dataArray);
+
+      data.addRows(dataArray);
+
+
+      // data.addRows
+      // ( [[ '1','5',25 ],
+      //   ['1','4',18 ],
+      //   [ '1','6', 10]] );
+
+
+
+      // data.addRows([
+      //    [ 'Brazil', 'Portugal', 5 ],
+      //    [ 'Brazil', 'France', 1 ],
+      //    [ 'Brazil', 'Spain', 1 ],
+      //    [ 'Brazil', 'England', 1 ],
+      //    [ 'Brazil', 'Portugal', 1 ],
+      //    [ 'Brazil', 'France', 5 ],
+      //    [ 'Brazil', 'England', 1 ],
+      //    [ 'Brazil', 'Portugal', 1 ],
+      //    [ 'Brazil', 'France', 1 ],
+      //    [ 'Brazil', 'Spain', 5 ],
+      //    [ 'Brazil', 'England', 1 ],
+      //    [ 'Brazil', 'Portugal', 1 ],
+      //    [ 'Brazil', 'France', 1 ],
+      //    [ 'Brazil', 'Spain', 1 ],
+      //    [ 'Brazil', 'England', 5 ],
+      //    [ 'Brazil', 'Angola', 2 ],
+      //    [ 'Brazil', 'Senegal', 1 ],
+      //    [ 'Brazil', 'Morocco', 1 ],
+      //    [ 'Brazil', 'South Africa', 3 ],
+      //    [ 'Brazil', 'Angola', 1 ],
+      //    [ 'Brazil', 'Senegal', 3 ],
+      //    [ 'Brazil', 'Mali', 3 ],
+      //    [ 'Brazil', 'Morocco', 3 ],
+      //    [ 'Brazil', 'South Africa', 1 ],
+      //    [ 'Brazil', 'Senegal', 1 ],
+      //    [ 'Brazil', 'Morocco', 3 ],
+      //    [ 'Brazil', 'South Africa', 1 ],
+      //    [ 'Brazil', 'Angola', 1 ],
+      //    [ 'Brazil', 'Senegal', 1 ],
+      //    [ 'Brazil', 'Morocco', 2 ],
+      //    [ 'Brazil', 'South Africa', 7 ],
+      //    [ 'Brazil', 'China', 5 ],
+      //    [ 'Brazil', 'India', 1 ],
+      //    [ 'Brazil', 'Japan', 3 ],
+      //    [ 'Brazil', 'China', 5 ],
+      //    [ 'Brazil', 'India', 1 ],
+      //    [ 'Brazil', 'Japan', 3 ],
+      //    [ 'Brazil', 'China', 5 ],
+      //    [ 'Brazil', 'India', 1 ],
+      //    [ 'Brazil', 'Japan', 3 ],
+      //    [ 'Brazil', 'China', 5 ],
+      //    [ 'Brazil', 'India', 1 ],
+      //    [ 'Brazil', 'Japan', 3 ],
+      //    [ 'Brazil', 'China', 5 ],
+      //    [ 'Brazil', 'India', 1 ],
+      //    [ 'Brazil', 'Japan', 3 ]
+      // ]);
+
+      // Set chart options
+      var options = {
+        width: 600,
+      };
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
+      chart.draw(data, options);
+
+      var colors = ['#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+                '#cab2d6', '#ffff99', '#1f78b4', '#33a02c'];
+     }
+  </script>
 
 </html>

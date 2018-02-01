@@ -16,10 +16,12 @@
   "author": "Martin Barnard",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.6.0",
     "consolidate": "^0.14.1",
     "express": "^4.14.0",
     "express-bootstrap-service": "^1.0.0",
     "handlebars": "^4.0.5",
+    "lodash-node": "^3.10.2",
     "superagent": "^2.1.0"
   }
 }
