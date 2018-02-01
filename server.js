@@ -24,6 +24,7 @@ var api_key = keys.nyt_books;
 var secondChord;
 var thirdChord;
 var fourthChord;
+var fifthChord;
 // Get json and provide queries
 // Pass api_key and set header
 // Render response if no errors
@@ -45,7 +46,7 @@ app.get('/', function(req, res, next) {
         secondChord = results.getFirstChords[0].chord_ID;
         console.log('secondChord**', secondChord);
 
-        superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + secondChord)
+        superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + '1,' + secondChord)
 
         .set({ 'Authorization': 'Bearer 1317c4616fbdba61a7f1726730c01467'})
 
@@ -60,7 +61,7 @@ app.get('/', function(req, res, next) {
     getThirdChords: ['getFirstChords', function(results, callback) {
         thirdChord = results.getFirstChords[1].chord_ID;
 
-        superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + thirdChord)
+        superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + '1,' + thirdChord)
 
       .set({ 'Authorization': 'Bearer 1317c4616fbdba61a7f1726730c01467'})
 
@@ -75,7 +76,7 @@ app.get('/', function(req, res, next) {
   getFourthChords: ['getFirstChords', function(results, callback) {
       fourthChord = results.getFirstChords[2].chord_ID;
 
-      superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + fourthChord)
+      superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + '1,' + fourthChord)
 
     .set({ 'Authorization': 'Bearer 1317c4616fbdba61a7f1726730c01467'})
 
@@ -85,6 +86,21 @@ app.get('/', function(req, res, next) {
         }
         return callback(null, response.body);
     })
+}],
+
+getFifthChords: ['getFirstChords', function(results, callback) {
+    fifthChord = results.getFirstChords[3].chord_ID;
+
+    superagent.get('https://api.hooktheory.com/v1/trends/nodes?cp=' + '1,' + fifthChord)
+
+  .set({ 'Authorization': 'Bearer 1317c4616fbdba61a7f1726730c01467'})
+
+  .end(function(err, response) {
+      if (err) {
+        return callback(err);
+      }
+      return callback(null, response.body);
+  })
 }],
 
     }, function(err, results) {
@@ -128,16 +144,26 @@ app.get('/', function(req, res, next) {
               item.child_path = item.child_path.substring(2);
           })
 
+          _.forEach(results.getFifthChords, function(item) {
+              // Round the probability to 1 decimal point
+              item.probability = Number((item.probability * 100).toFixed(1));
+
+              // Remove the first number, because we know we're starting with the "I" chord
+              item.child_path = item.child_path.substring(2);
+          })
+
           console.log('results.getFourthChords@', results.getFourthChords);
 
           return res.render('index', {
               firstChords: results.getFirstChords,
               secondChords: results.getSecondChords,
               thirdChords: results.getThirdChords,
-             fourthChords: results.getFourthChords,
+              fourthChords: results.getFourthChords,
+             fifthChords: results.getFifthChords,
              secondChord: secondChord,
              thirdChord: thirdChord,
              fourthChord: fourthChord,
+             fifthChord: fifthChord,
 
               helpers: {
                 toJSON : function(object) {

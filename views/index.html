@@ -48,6 +48,7 @@
     <div id="second-chord" data-chord-data="{{secondChord}}"></div>
     <div id="third-chord" data-chord-data="{{thirdChord}}"></div>
     <div id="fourth-chord" data-chord-data="{{fourthChord}}"></div>
+    <div id="fifth-chord" data-chord-data="{{fifthChord}}"></div>
 
 </body>
 
@@ -66,18 +67,23 @@
     fourthChord = fourthChord.toString();
     console.log('4th', fourthChord);
 
+    var fifthChord = $('#fifth-chord').data('chord-data');
+    fifthChord = fifthChord.toString();
+
     var firstChords = $('#chord-data').data('chord-data');
-    firstChords = firstChords.slice(0, 3);
+    firstChords = firstChords.slice(0, 4);
 
     var secondChords = $('#chord-data2').data('chord-data');
-    secondChords = secondChords.slice(0, 3);
+    secondChords = secondChords.slice(0, 6);
 
     var thirdChords = $('#chord-data3').data('chord-data');
-    thirdChords = thirdChords.slice(0, 3);
+    thirdChords = thirdChords.slice(0, 6);
 
     var fourthChords = $('#chord-data4').data('chord-data');
-    fourthChords = fourthChords.slice(0, 3);
+    fourthChords = fourthChords.slice(0, 6);
 
+    var fifthChords = $('#chord-data4').data('chord-data');
+    fifthChords = fifthChords.slice(0, 6);
 
     google.charts.load("current", {packages:["sankey"]});
     google.charts.setOnLoadCallback(drawChart);
@@ -120,6 +126,14 @@
           console.log('item.chord_ID after', item.chord_ID);
           console.log('fourthChord___', fourthChord);
           dataArray.push([fourthChord, item.chord_ID, item.probability]);
+      }),
+
+      _.forEach(fifthChords, function(item) {
+          console.log('item.chord_ID before', item.chord_ID);
+          item.chord_ID = item.chord_ID.concat('    ');
+          console.log('item.chord_ID after', item.chord_ID);
+          console.log('fifthChord___', fifthChord);
+          dataArray.push([fifthChord, item.chord_ID, item.probability]);
       }),
 
       console.log('dataArray++', dataArray);
